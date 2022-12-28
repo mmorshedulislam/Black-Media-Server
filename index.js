@@ -20,11 +20,27 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const usersCollection = client.db("blackMedia").collection("users");
+    const postsCollection = client.db("blackMedia").collection("posts");
 
+    // CREATE USER
     app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await usersCollection.insertOne(user);
       res.send({ status: true, result });
+    });
+
+    // CREATE POST
+    app.post("/posts", async (req, res) => {
+      const post = req.body;
+      const result = await postsCollection.insertOne(post);
+      res.send({ status: true, result });
+    });
+
+    // GET ALL POSTS
+    app.get("/posts", async (req, res) => {
+      const query = {};
+      const posts = await postsCollection.find(query).toArray();
+      res.send(posts);
     });
   } catch (error) {}
 }
