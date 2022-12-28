@@ -40,7 +40,10 @@ async function run() {
     // GET ALL POSTS
     app.get("/posts", async (req, res) => {
       const query = {};
-      const posts = await postsCollection.find(query).toArray();
+      const posts = await postsCollection
+        .find(query)
+        .sort({ likes: -1 })
+        .toArray();
       res.send({ posts });
     });
 
