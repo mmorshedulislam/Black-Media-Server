@@ -30,6 +30,14 @@ async function run() {
       res.send({ status: true, result });
     });
 
+    // GET ALL USERS
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { userEmail: email };
+      const user = await usersCollection.findOne(query);
+      res.send(user);
+    });
+
     // CREATE POST
     app.post("/posts", async (req, res) => {
       const post = req.body;
@@ -43,6 +51,16 @@ async function run() {
       const posts = await postsCollection
         .find(query)
         .sort({ likes: -1 })
+        .toArray();
+      res.send({ posts });
+    });
+
+    // GET POSTS BY RATINGS
+    app.get("/postsbyratings", async (req, res) => {
+      const query = {};
+      const posts = await postsCollection
+        .find(query)
+        .sort({ ratings: -1 })
         .toArray();
       res.send({ posts });
     });
@@ -87,7 +105,7 @@ async function run() {
     });
 
     // NEW LIKES
-    app.post("/newlike", async (req, res) => {
+    app.put("/newlike", async (req, res) => {
       const like = req.body;
       console.log(like);
       const postId = like.postId;
@@ -107,7 +125,7 @@ async function run() {
     });
 
     // NEW LOVES
-    app.post("/newlove", async (req, res) => {
+    app.put("/newlove", async (req, res) => {
       const love = req.body;
       console.log(love);
       const postId = love.postId;
@@ -124,6 +142,48 @@ async function run() {
         options
       );
       res.send({ status: true, updatePost });
+    });
+
+    // NEW RATINGS
+    app.put("/newrating", async (req, res) => {
+      const rating = req.body;
+      console.log(rating);
+      const postId = rating.postId;
+      const filter = { _id: ObjectId(postId) };
+      const updateDoc = {
+        $set: {
+          ratings: rating.newRatings,
+        },
+      };
+      const options = { upsert: true };
+      const updatePost = await postsCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.send({ status: true, updatePost });
+    });
+
+    // UPDATE PROFILE
+    app.put("/updateprofile", async (req, res) => {
+      const profileData = req.body;
+      const { userId, name, email, institute, address } = profileData;
+      const filter = { _id: ObjectId(userId) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          userName: name,
+          userEmail: email,
+          institute: institute,
+          address: address,
+        },
+      };
+      const result = await usersCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.send(result);
     });
 
     // MONGODB ENDS
