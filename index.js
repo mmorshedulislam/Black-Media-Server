@@ -31,6 +31,13 @@ async function run() {
     });
 
     // GET ALL USERS
+    app.get("/users", async (req, res) => {
+      const query = {};
+      const user = await usersCollection.find(query).toArray();
+      res.send(user);
+    });
+
+    // GET ALL USERS
     app.get("/user/:email", async (req, res) => {
       const email = req.params.email;
       const query = { userEmail: email };
@@ -69,7 +76,6 @@ async function run() {
     app.get("/postsbyuser", async (req, res) => {
       const user = req.query.user;
       const query = { authorEmail: user };
-      console.log(query);
       const posts = await postsCollection.find(query).toArray();
       res.send({ posts });
     });
@@ -107,7 +113,6 @@ async function run() {
     // NEW LIKES
     app.put("/newlike", async (req, res) => {
       const like = req.body;
-      console.log(like);
       const postId = like.postId;
       const filter = { _id: ObjectId(postId) };
       const updateDoc = {
@@ -127,7 +132,6 @@ async function run() {
     // NEW LOVES
     app.put("/newlove", async (req, res) => {
       const love = req.body;
-      console.log(love);
       const postId = love.postId;
       const filter = { _id: ObjectId(postId) };
       const updateDoc = {
@@ -147,7 +151,6 @@ async function run() {
     // NEW RATINGS
     app.put("/newrating", async (req, res) => {
       const rating = req.body;
-      console.log(rating);
       const postId = rating.postId;
       const filter = { _id: ObjectId(postId) };
       const updateDoc = {
